@@ -1,24 +1,24 @@
 {
   "name": "@dinert/time-player",
-  "private": true,
-  "version": "0.0.0",
+  "version": "1.0.42",
   "type": "module",
   "main": "lib/index.js",
-  "module": "es/compoents/index.mjs",
+  "module": "es/index.mjs",
   "types": "es/src/index.d.ts",
   "exports": {
     ".": {
-        "types": "./es/src/index.d.ts",
-        "import": "./es/index.mjs",
-        "require": "./lib/index.js"
+      "types": "./es/src/index.d.ts",
+      "import": "./es/index.mjs",
+      "require": "./lib/index.js"
     },
     "./style": {
-        "import": "./es/style.css"
+      "import": "./es/style.css"
     }
-},
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:test": "vite build --mode test",
     "preview": "vite preview"
   },
   "devDependencies": {
@@ -30,7 +30,6 @@
     "@types/node": "^20.11.24",
     "@typescript-eslint/eslint-plugin": "^7.1.0",
     "@typescript-eslint/parser": "^7.1.0",
-    "@vue/composition-api": "^1.7.2",
     "dayjs": "^1.11.10",
     "eslint": "^8.57.0",
     "eslint-plugin-vue": "^9.22.0",
@@ -76,7 +75,10 @@
     "@dinert/time-player"
   ],
   "files": [
-    "dist"
+    "dist",
+    "es",
+    "lib"
   ],
-  "repository": "git@github.com:Dinert/time-player.git"
+  "repository": "git@github.com:Dinert/time-player.git",
+  "dependencies": {}
 }
