@@ -1,8 +1,7 @@
 # 自适应时间轴播放器
 
 ## 前言
-- 这是一个从0到1实现的时间轴播放器，除了时间格式化用了第三库dayjs以外，其它的都是使用纯源生的js实现的
-- 支持vue2和vue3版本
+- 这是一个从0到1实现的时间轴播放器，除了时间格式化用了第三库
 ## 效果
 ![image](/src/assets/gif/time-player.gif)
 ## 技术栈
@@ -24,8 +23,8 @@ npm i @dienrt/time-player --save
 yarn add @dinert/time-player
 ```
 
-## 引入
-### vue2
+## 全局引入
+
 ```js
 import Vue from 'vue'
 import App from './App.vue'
@@ -38,27 +37,71 @@ new Vue({
 
 ```
 
-### vue3
-```js
-// main.ts
-import { createApp } from 'vue'
-import App from './App.vue'
-import DinerTimePlayer from '@dinert/time-player'
-
-const app = createApp(App)
-app.use(DinerTimePlayer)
-app.mount('#app')
-
-```
 ### 按需导入
 ```js
-  import DinertTimePlayer from '@dinert/time-player'
-  <dinert-time-player></dinert-time-player>
+  import {DinertTimePlayer} from '@dinert/time-player'
   export default {
     components: {
       DinertTimePlayer
     }
   }
+
+```
+
+### 使用
+```html
+<template>
+    <div class="app">
+        <dinert-time-player ref="timePlayerRef" :current-time="currentTime"
+            @animate-before="animateBefore"
+            @animate-after="animateAfter"
+        />
+        <div class="button">
+            <button type="button" @click="$refs.timePlayerRef.startPlay()">开始播放</button>
+            <button type="button" @click="$refs.timePlayerRef.stopPlay()">停止播放</button>
+        </div>
+    </div>
+</template>
+
+<script>
+  import {DinertTimePlayer} from '@dinert/time-player'
+
+export default {
+    name: 'Home',
+    components: {
+        DinertTimePlayer
+    },
+    data() {
+        return {
+            currentTime: new Date(),
+        }
+    },
+    methods: {
+        animateBefore(config) {
+            console.log(config, 'animateBefore')
+        },
+        animateAfter(config) {
+            console.log(config, 'animateAfter')
+        }
+    }
+}
+</script>
+
+<style lang="scss" scoped>
+
+.app {
+    margin-top: 80px;
+}
+
+.button {
+    margin: 20px auto;
+    text-align: center;
+
+    button {
+        margin-left: 20px;
+    }
+}
+</style>
 
 ```
 
@@ -81,8 +124,8 @@ app.mount('#app')
 
 
 ## 事件
-| 参数           | 说明                       | 参数   | 类型     |
-| -------------- | -------------------------- | ------ | -------- |
+| 参数           | 说明                       | 参数                           | 类型     |
+| -------------- | -------------------------- | ------------------------------ | -------- |
 | animate-before | 当点击时间轴触发           | [看下表](./README.md#参数名称) | Function |
 | animate-after  | 当点击时间轴动画完成后触发 | [看下表](./README.md#参数名称) | Function |
 

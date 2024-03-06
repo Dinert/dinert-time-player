@@ -9,5 +9,5 @@ const withInstall = (comp: any) => {
     }
     return comp
 }
-export const TimePlay = withInstall(_TimePlay)
-export default TimePlay
+export const DinertTimePlayer = withInstall(_TimePlay)
+export default DinertTimePlayer

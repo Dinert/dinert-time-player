@@ -17,7 +17,7 @@ export default defineConfig(({mode}) => {
                     {
                         format: 'es',
                         // 打包后文件名
-                        entryFileNames: '[name].mjs',
+                        entryFileNames: '[name].js',
 
                         // 让打包目录和我们目录对应
                         preserveModules: true,
@@ -73,12 +73,13 @@ export default defineConfig(({mode}) => {
             extensions: ['.js', '.json', '.jsx', '.mjs', '.ts', '.tsx', '.vue']
         },
         server: {
-            port: 8956,
+            port: 8957,
         },
 
     }
     if (mode === 'test') {
         config.build = {}
+        config.base = './'
     }
     return config
 })

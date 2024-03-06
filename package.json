@@ -3,12 +3,12 @@
   "version": "1.0.42",
   "type": "module",
   "main": "lib/index.js",
-  "module": "es/index.mjs",
+  "module": "es/index.js",
   "types": "es/src/index.d.ts",
   "exports": {
     ".": {
       "types": "./es/src/index.d.ts",
-      "import": "./es/index.mjs",
+      "import": "./es/index.js",
       "require": "./lib/index.js"
     },
     "./style": {
@@ -30,6 +30,7 @@
     "@types/node": "^20.11.24",
     "@typescript-eslint/eslint-plugin": "^7.1.0",
     "@typescript-eslint/parser": "^7.1.0",
+    "@vue/composition-api": "^1.7.2",
     "dayjs": "^1.11.10",
     "eslint": "^8.57.0",
     "eslint-plugin-vue": "^9.22.0",
