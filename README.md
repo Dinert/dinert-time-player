@@ -15,11 +15,11 @@
 ## 如何安装
 * 如果你使用npm
 ```shell
-npm i @dienrt/time-player --save
+npm i @dienrt/time-player dayjs --save
 ```
 * 或者使用yarn
 ```shell
-yarn add @dinert/time-player
+yarn add @dinert/time-player dayjs
 ```
 
 ## 全局引入

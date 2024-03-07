@@ -1,6 +1,6 @@
 {
   "name": "@dinert/time-player",
-  "version": "1.0.44",
+  "version": "1.0.45",
   "type": "module",
   "main": "lib/index.js",
   "module": "es/src/index.js",
