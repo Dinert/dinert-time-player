@@ -1,6 +1,6 @@
 {
   "name": "@dinert/time-player",
-  "version": "1.0.43",
+  "version": "1.0.44",
   "type": "module",
   "main": "lib/index.js",
   "module": "es/src/index.js",
@@ -81,6 +81,9 @@
     "es",
     "lib"
   ],
-  "repository": "git@github.com:Dinert/time-player.git",
-  "dependencies": {}
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Dinert/dinert-time-player.git"
+  },
+  "homepage": "https://github.com/Dinert/dinert-time-player#readme"
 }
