@@ -1,4 +1,4 @@
-import {defineComponent} from '@vue/composition-api'
+import {computed, defineComponent, onMounted, ref, toRefs} from '@vue/composition-api'
 import dayjs from 'dayjs'
 
 import '@/assets/scss/dinert-time-player.scss'
@@ -93,43 +93,36 @@ export default defineComponent({
             default: 2000,
         },
     },
-    data() {
-        return {
-            barRef: null as HTMLElement | null,
-            tooltipRef: null as HTMLElement | null,
-            tempTooltipRef: null as HTMLElement | null,
-            isTempTooltip: false,
-            isPlay: false,
-            config: {} as ConfigType,
-            timeTimeout: null as any,
-            currentTempTime: this.currentTime,
-            hoverTime: this.currentTime,
-            timeClickFlag: false,
-        }
-    },
-    mounted() {
-        this.barRef = this.$refs.barRef as any
-        this.tooltipRef = this.$refs.tooltipRef as any
-        this.tempTooltipRef = this.$refs.tempTooltipRef as any
+    emits: ['animate-before', 'animate-after'],
 
-        this.animateAfter()
-        const width = getWidth(this.startTime, this.endTime, this.currentTempTime)
-        this.autoMove(width, undefined)
-    },
-    computed: {
-        items() {
+    setup(props, {emit}) {
+        const {currentTime, formatTooltip, startTime, endTime, interval, formatFooter, stopTime, delay} = toRefs(props)
+
+        const barRef = ref<HTMLElement | null>(null)
+        const tooltipRef = ref<HTMLElement | null>(null)
+        const tempTooltipRef = ref<HTMLElement | null>(null)
+
+        const isTempTooltip = ref(false) // 是否显示暂时的tooltip
+        const isPlay = ref(false) // 是否在播放
+        const config = ref<ConfigType>({})
+        const timeTimeout = ref<any>(null)
+        const currentTempTime = ref<Date>(currentTime.value) // 当前时间
+        const hoverTime = ref(currentTime.value) // 时间移动过去的tooltip
+        const timeClickFlag = ref(false) // 是否是鼠标点击触发
+
+        const items = computed(() => {
             const result: ResultType[] = []
             const hours = 3600 * 1000
             const daysTimestamp = hours * 24
-            let time = dayjs(this.startTime).valueOf()
-            const items = dayjs(this.endTime).diff(dayjs(this.startTime), 'days')
+            let time = dayjs(startTime.value).valueOf()
+            const items = dayjs(endTime.value).diff(dayjs(startTime.value), 'days')
             const width = 100 / items + '%'
-            const left = 100 / (24 / this.interval)
+            const left = 100 / (24 / interval.value)
             for (let i = 0; i < items; i++) {
                 const tempArr: any = []
                 let count = 0
                 for (let j = 1; j < 24; j++) {
-                    if (j % this.interval === 0) {
+                    if (j % interval.value === 0) {
                         count++
                         tempArr.push({
                             text: j,
@@ -140,124 +133,162 @@ export default defineComponent({
                 }
                 result.push({
                     hours: tempArr,
-                    time: dayjs(time).format(this.formatFooter),
+                    time: dayjs(time).format(formatFooter.value),
                     width,
                 })
                 time += daysTimestamp
             }
             return result
-        },
-        formatTooltipText() {
-            return dayjs(this.currentTempTime).format(this.formatTooltip)
+        })
 
-        },
-        formatTempTooltipText() {
-            return dayjs(this.hoverTime).format(this.formatTooltip)
+        const formatTooltipText = computed(() => {
+            return dayjs(currentTempTime.value).format(formatTooltip.value)
+        })
 
-        }
-    },
-    methods: {
-        autoMove(width, event) {
+        const formatTempTooltipText = computed(() => {
+            return dayjs(hoverTime.value).format(formatTooltip.value)
+        })
+
+        //  自动播放
+        const autoMove = (width, event) => {
             // 自动播放
-            !event && this.isPlay && (this.currentTempTime = dayjs(this.currentTempTime).add(1, 'hours').toDate())
-            let percent = width || getWidth(this.startTime, this.endTime, this.currentTempTime)
+            !event && isPlay.value && (currentTempTime.value = dayjs(currentTempTime.value).add(1, 'hours').toDate())
+            let percent = width || getWidth(startTime.value, endTime.value, currentTempTime.value)
 
             // 判断超出距离设置为100
             if (percent > 100) {
                 percent = 100
             }
 
-            this.barRef && (this.barRef.style.width = percent + '%')
-            this.tooltipRef && (this.tooltipRef.style.left = percent + '%')
+            barRef.value && (barRef.value.style.width = percent + '%')
+            tooltipRef.value && (tooltipRef.value.style.left = percent + '%')
 
             if (!event) {
 
-                this.config = {
+                config.value = {
                     percent,
-                    time: dayjs(this.currentTempTime).startOf('hours').format('YYYY-MM-DD HH:mm:ss'),
-                    width: this.barRef?.offsetWidth,
-                    timestamp: dayjs(this.currentTempTime).startOf('hours').valueOf()
+                    time: dayjs(currentTempTime.value).startOf('hours').format('YYYY-MM-DD HH:mm:ss'),
+                    width: barRef.value?.offsetWidth,
+                    timestamp: dayjs(currentTempTime.value).startOf('hours').valueOf()
                 }
             }
 
 
             // 判断结束时间是否大于当前时间，如果大于就停止播放
-            if (dayjs(this.stopTime).startOf('hours').valueOf() <= dayjs(this.currentTempTime).valueOf()) {
-                this.isPlay = false
+            if (dayjs(stopTime.value).startOf('hours').valueOf() <= dayjs(currentTempTime.value).valueOf()) {
+                isPlay.value = false
             }
-            if (this.isPlay) {
+            if (isPlay.value) {
 
 
-                this.timeTimeout && clearTimeout(this.timeTimeout)
-                this.timeTimeout = (setTimeout(() => {
-                    this.autoMove(undefined, undefined)
-                }, this.delay) as any)
+                timeTimeout.value && clearTimeout(timeTimeout.value)
+                timeTimeout.value = setTimeout(() => {
+                    autoMove(undefined, undefined)
+                }, delay.value)
             } else {
-                this.timeTimeout && clearTimeout(this.timeTimeout)
+                timeTimeout.value && clearTimeout(timeTimeout.value)
             }
-        },
-        timeClick(event) {
-            this.timeClickFlag = true
-            this.config = getConfig(event, this.startTime, this.endTime)
-
-            // 判断结束时间是否大于当前时间，如果大于就停止播放
-            if (dayjs(this.stopTime).startOf('hours').valueOf() <= dayjs(this.config.time).valueOf()) {
-                return
-            }
-
-            this.currentTempTime = dayjs(this.config.time).toDate()
-
-            this.autoMove(this.config.percent, event)
-            this.$emit('animate-before', this.config)
-        },
-        animateAfter() {
-            this.barRef && this.barRef.addEventListener('transitionend', () => {
-                if (!this.timeClickFlag) {
-                    this.$emit('animate-after', this.config)
-                } else {
-                    this.timeClickFlag = false
-                }
-            })
-        },
-
-        timeMouseEnter(event) {
-            const config = getConfig(event, this.startTime, this.endTime)
-            this.tempTooltipRef && (this.tempTooltipRef.style.left = config.percent + '%')
-            this.hoverTime = dayjs(config.time).toDate()
-            this.isTempTooltip = true
-        },
-        timeMouseLeave() {
-            this.isTempTooltip = false
-        },
-        timePlay() {
-            // 判断结束时间是否大于当前时间，如果大于就停止播放
-            if (dayjs(this.stopTime).startOf('hours').valueOf() <= dayjs(this.currentTempTime).valueOf()) {
-                return
-            }
-
-            this.isPlay = !this.isPlay
-            if (this.isPlay) {
-                this.timeTimeout && clearTimeout(this.timeTimeout)
-                this.timeTimeout = setTimeout(this.autoMove, this.delay)
-            } else {
-                clearTimeout(this.timeTimeout)
-            }
-        },
-        // 开始播放
-        startPlay() {
-            this.isPlay = true
-            this.timeTimeout && clearTimeout(this.timeTimeout)
-            this.timeTimeout = setTimeout(this.autoMove, this.delay)
-        },
-        stopPlay() {
-            this.isPlay = false
-            this.timeTimeout && clearTimeout(this.timeTimeout)
-        },
-        timeNowFn() {
-            this.currentTempTime = dayjs(this.currentTime).toDate()
-            this.autoMove(undefined, undefined)
         }
 
+
+        const timeClick = event => {
+            timeClickFlag.value = true
+            config.value = getConfig(event, startTime.value, endTime.value)
+
+            // 判断结束时间是否大于当前时间，如果大于就停止播放
+            if (dayjs(stopTime.value).startOf('hours').valueOf() <= dayjs(config.value.time).valueOf()) {
+                return
+            }
+
+            currentTempTime.value = dayjs(config.value.time).toDate()
+
+            autoMove(config.value.percent, event)
+            emit('animate-before', config.value)
+        }
+
+        // 动画执行完的回调
+        const animateAfter = () => {
+            barRef.value && barRef.value.addEventListener('transitionend', () => {
+                if (!timeClickFlag.value) {
+                    emit('animate-after', config.value)
+                } else {
+                    timeClickFlag.value = false
+                }
+            })
+        }
+
+
+        const timeMouseEnter = event => {
+            const config = getConfig(event, startTime.value, endTime.value)
+            tempTooltipRef.value && (tempTooltipRef.value.style.left = config.percent + '%')
+            hoverTime.value = dayjs(config.time).toDate()
+            isTempTooltip.value = true
+        }
+
+        const timeMouseLeave = () => {
+            isTempTooltip.value = false
+        }
+
+        // 播放
+        const timePlay = () => {
+        // 判断结束时间是否大于当前时间，如果大于就停止播放
+            if (dayjs(stopTime.value).startOf('hours').valueOf() <= dayjs(currentTempTime.value).valueOf()) {
+                return
+            }
+
+            isPlay.value = !isPlay.value
+            if (isPlay.value) {
+                timeTimeout.value && clearTimeout(timeTimeout.value)
+                timeTimeout.value = setTimeout(autoMove, delay.value)
+            } else {
+                clearTimeout(timeTimeout.value)
+            }
+        }
+
+        // 开始播放
+        const startPlay = () => {
+            isPlay.value = true
+            timeTimeout.value && clearTimeout(timeTimeout.value)
+            timeTimeout.value = setTimeout(autoMove, delay.value)
+        }
+
+        const stopPlay = () => {
+            isPlay.value = false
+            timeTimeout.value && clearTimeout(timeTimeout.value)
+        }
+
+        const timeNowFn = () => {
+            currentTempTime.value = dayjs(currentTime.value).toDate()
+            autoMove(undefined, undefined)
+        }
+
+        onMounted(() => {
+            animateAfter()
+            const width = getWidth(startTime.value, endTime.value, currentTempTime.value)
+            autoMove(width, undefined)
+        })
+
+
+        return {
+            barRef,
+            tooltipRef,
+            tempTooltipRef,
+
+            isPlay,
+            formatTempTooltipText,
+            formatTooltipText,
+            isTempTooltip,
+            items,
+
+            timeNowFn,
+            timePlay,
+            timeClick,
+            timeMouseEnter,
+            timeMouseLeave,
+
+            startPlay,
+            stopPlay
+        }
     },
     render() {
         return (

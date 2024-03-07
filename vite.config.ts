@@ -11,7 +11,7 @@ export default defineConfig(({mode}) => {
 
             sourcemap: true, // 是否打包map文件
             rollupOptions: {
-                external: ['vue', 'dayjs', '@vue/composition-api'],
+                external: ['vue', 'dayjs'],
                 input: ['./src/index.ts'],
                 output: [
                     {
@@ -54,8 +54,13 @@ export default defineConfig(({mode}) => {
         },
         plugins: [
             createVuePlugin({
+                vueTemplateOptions: {},
                 jsx: true,
+                jsxOptions: {
+                    compositionAPI: false,
+                }
             }),
+
             dts({
                 entryRoot: './src/components',
 

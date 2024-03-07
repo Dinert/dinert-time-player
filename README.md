@@ -29,6 +29,7 @@ yarn add @dinert/time-player
 import Vue from 'vue'
 import App from './App.vue'
 import DinerTimePlayer from '@dinert/time-player'
+import '@dinert/time-player/style'
 Vue.use(DinerTimePlayer)
 
 new Vue({
@@ -40,6 +41,7 @@ new Vue({
 ### 按需导入
 ```js
   import {DinertTimePlayer} from '@dinert/time-player'
+  import '@dinert/time-player/style'
   export default {
     components: {
       DinertTimePlayer
@@ -65,7 +67,7 @@ new Vue({
 
 <script>
   import {DinertTimePlayer} from '@dinert/time-player'
-
+import '@dinert/time-player/style'
 export default {
     name: 'Home',
     components: {
