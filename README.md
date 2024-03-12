@@ -2,6 +2,8 @@
 
 ## 前言
 - 这是一个从0到1实现的时间轴播放器，除了时间格式化用了第三库
+- 支持TypeScript
+- 有两种主题，默认是dark。class设置为light为白色风格
 
 ## 效果
 ![image](/src/assets/gif/time-player.gif)

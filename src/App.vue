@@ -1,12 +1,26 @@
 <template>
     <div class="app">
-        <dinert-time-player ref="timePlayerRef" :current-time="currentTime"
-            @animate-before="animateBefore"
-            @animate-after="animateAfter"
-        />
-        <div class="button">
-            <button type="button" @click="$refs.timePlayerRef.startPlay()">开始播放</button>
-            <button type="button" @click="$refs.timePlayerRef.stopPlay()">停止播放</button>
+        <h1>Vue2时间轴播放器</h1>
+        <div>
+            <dinert-time-player ref="timePlayerRef" :current-time="currentTime"
+                @animate-before="animateBefore"
+                @animate-after="animateAfter"
+            />
+            <div class="button">
+                <button type="button" @click="$refs.timePlayerRef.startPlay()">开始播放</button>
+                <button type="button" @click="$refs.timePlayerRef.stopPlay()">停止播放</button>
+            </div>
+        </div>
+        <div>
+            <dinert-time-player ref="timePlayerRef2" :current-time="currentTime"
+                class="light"
+                @animate-before="animateBefore"
+                @animate-after="animateAfter"
+            />
+            <div class="button">
+                <button type="button" @click="$refs.timePlayerRef2.startPlay()">开始播放</button>
+                <button type="button" @click="$refs.timePlayerRef2.stopPlay()">停止播放</button>
+            </div>
         </div>
     </div>
 </template>
@@ -34,7 +48,17 @@ export default {
 <style lang="scss" scoped>
 
 .app {
-    margin-top: 80px;
+    overflow: hidden;
+    height: 100%;
+    background-color: #f5f5f5;
+
+    h1 {
+        text-align: center;
+    }
+
+    & > div {
+        margin-top: 120px;
+    }
 }
 
 .button {
@@ -45,4 +69,13 @@ export default {
         margin-left: 20px;
     }
 }
+</style>
+
+<style lang="scss">
+    html,
+    body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+    }
 </style>
