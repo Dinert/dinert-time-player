@@ -85,5 +85,6 @@
     "type": "git",
     "url": "https://github.com/Dinert/dinert-time-player.git"
   },
+  "license": "MIT",
   "homepage": "https://github.com/Dinert/dinert-time-player#readme"
 }
